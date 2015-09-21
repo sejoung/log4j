@@ -261,9 +261,14 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 
 		String datedFilename = filePath + File.separatorChar + scheduledFoldername + File.separatorChar + fileName + sdf.format(now);
 
-		File target = new File(datedFilename);
-
-		if (scheduledFilename.equals(datedFilename) && scheduledFoldername.equals(dateScheduledFoldername) && target.exists()) {
+		/**
+		 *  target 파일을  scheduledFilename으로 하면 최초에는 파일이 생성 되지 않는다
+		 *  
+		 *  하지만 target 파일을 datedFilename 파일로 하면 파일생성
+		 *  
+		 */
+		
+		if (scheduledFilename.equals(datedFilename) && scheduledFoldername.equals(dateScheduledFoldername)) {
 			return;
 		}
 
@@ -275,7 +280,9 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 
 		// close current file, and rename it to datedFilename
 		this.closeFile();
-
+		
+		File target = new File(scheduledFilename);
+		
 		if (target.exists()) {
 			target.delete();
 		}
