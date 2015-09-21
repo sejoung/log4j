@@ -3,9 +3,7 @@ log4j appender
 
 날짜별 Rolling 폴더 파일을 동시에 Rolling 가능
 
-
-<appender name="TEST"
-		class="kr.co.killers.log4j.appender.DailyRollingFolderAndFileAppender">
+	<appender name="TEST" class="kr.co.killers.log4j.appender.DailyRollingFolderAndFileAppender">
 		<param name="file" value="test.log" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd-HH-mm" />
 		<param name="folderDatePattern" value="yyyyMMdd" />
