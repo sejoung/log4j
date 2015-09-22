@@ -267,6 +267,11 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 		 *  하지만 target 파일을 datedFilename 파일로 하면 파일생성
 		 *  
 		 */
+		LogLog.debug("scheduledFilename "+scheduledFilename);
+		LogLog.debug("datedFilename "+datedFilename);
+		
+		LogLog.debug("scheduledFoldername "+scheduledFoldername);
+		LogLog.debug("dateScheduledFoldername "+dateScheduledFoldername);
 		
 		if (scheduledFilename.equals(datedFilename) && scheduledFoldername.equals(dateScheduledFoldername)) {
 			return;
