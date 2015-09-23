@@ -6,17 +6,36 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.springframework.core.annotation.Order;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 
 public class DailyRollingFolderAndFileAppenderTEST extends TestCase {
+	String filePath = "logs";
+	String file = "temp.log";
+	String datePattern = "'.'yyyy-MM-dd-HH-mm-ss";
+	String folderDatePattern = "yyyyMMddHHmm";
 
+	Logger logger = Logger.getLogger(Test.class);
+	
+	@Order(value=1)
 	public void testAppender1() {
-		String filePath = "logs";
-		String file = "temp.log";
-		String datePattern = "'.'yyyy-MM-dd-HH";
-		String folderDatePattern = "yyyyMMdd";
+		DailyRollingFolderAndFileAppender wa = new DailyRollingFolderAndFileAppender();
+		wa.setFile(file);
+		wa.setFilePath(filePath);
+		wa.setLayout(new PatternLayout("%d %-5p %c{1} - %m%n"));
+		wa.setAppend(true);
+		wa.setDatePattern(datePattern);
+		wa.setFolderDatePattern(folderDatePattern);
+		wa.activateOptions();
+
+		logger.addAppender(wa);
+	}
+
+	@Order(value=2)
+	public void testAppender2() {
+	
 		Date now = new Date();
 		now.setTime(System.currentTimeMillis());
 
@@ -34,18 +53,6 @@ public class DailyRollingFolderAndFileAppenderTEST extends TestCase {
 			System.out.println(Folder.list().length);
 		}
 
-		DailyRollingFolderAndFileAppender wa = new DailyRollingFolderAndFileAppender();
-		wa.setFile(file);
-		wa.setFilePath(filePath);
-		wa.setLayout(new PatternLayout("%d %-5p %c{1} - %m%n"));
-		wa.setAppend(true);
-		wa.setDatePattern(datePattern);
-		//wa.setFolderDatePattern(folderDatePattern);
-		wa.activateOptions();
-
-		Logger logger = Logger.getLogger(Test.class);
-		logger.addAppender(wa);
-
 		for (int i = 0; i < 100; i++) {
 			logger.info("test-log");
 		}
@@ -55,6 +62,17 @@ public class DailyRollingFolderAndFileAppenderTEST extends TestCase {
 		File lastFolder = new File(scheduledFolderPath);
 		if (lastFolder.exists()) {
 			System.out.println(lastFolder.list().length);
+		}
+
+		try {
+			Thread.sleep(60000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for (int i = 0; i < 100; i++) {
+			logger.info("test-log");
 		}
 
 		//assertTrue(new File(scheduledFilename).exists());

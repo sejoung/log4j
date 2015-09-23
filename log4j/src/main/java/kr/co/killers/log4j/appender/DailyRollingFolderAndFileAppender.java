@@ -59,7 +59,7 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 
 	SimpleDateFormat fsdf;
 
-	FolderRollingCalendar rc = new FolderRollingCalendar();
+	RollingCalendar rc = new RollingCalendar();
 
 	FolderRollingCalendar frc = new FolderRollingCalendar();
 
@@ -126,12 +126,17 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 			printPeriodicity(type);
 			fPrintPeriodicity(ftype);
 			rc.setType(type);
-			frc.setFtype(ftype);
+			frc.setType(ftype);
 
 			File file = new File(filePath + File.separatorChar + fileName);
 
-			scheduledFoldername = fsdf.format(new Date(file.lastModified()));
-			scheduledFilename = filePath + File.separatorChar + scheduledFoldername + File.separatorChar + fileName + sdf.format(new Date(file.lastModified()));
+			Date lastModified = new Date(file.lastModified());
+			
+			LogLog.debug("lastModified " + lastModified);
+
+			scheduledFoldername = fsdf.format(lastModified);
+			
+			scheduledFilename = fileName + sdf.format(lastModified);
 
 		} else {
 			LogLog.error("Either File or DatePattern options are not set for appender [" + name + "].");
@@ -229,8 +234,8 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 				simpleDateFormat.setTimeZone(gmtTimeZone); // do all date
 															// formatting in GMT
 				String r0 = simpleDateFormat.format(epoch);
-				rollingCalendar.setFtype(i);
-				Date next = new Date(rollingCalendar.getFNextCheckMillis(epoch));
+				rollingCalendar.setType(i);
+				Date next = new Date(rollingCalendar.getNextCheckMillis(epoch));
 				String r1 = simpleDateFormat.format(next);
 				// System.out.println("Type = "+i+", r0 = "+r0+", r1 = "+r1);
 				if (r0 != null && r1 != null && !r0.equals(r1)) {
@@ -259,35 +264,37 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 
 		String dateScheduledFoldername = fsdf.format(now);
 
-		String datedFilename = filePath + File.separatorChar + scheduledFoldername + File.separatorChar + fileName + sdf.format(now);
+		String datedFileNamePath = filePath + File.separatorChar + scheduledFoldername + File.separatorChar + fileName + sdf.format(now);
+
+		String scheduledFileNamePath = filePath + File.separatorChar + scheduledFoldername + File.separatorChar + scheduledFilename;
+		
+		String datedFilename = fileName + sdf.format(now);
 
 		/**
-		 *  target 파일을  scheduledFilename으로 하면 최초에는 파일이 생성 되지 않는다
-		 *  
-		 *  하지만 target 파일을 datedFilename 파일로 하면 파일생성
-		 *  
+		 * target 파일을 scheduledFilename으로 하면 최초에는 파일이 생성 되지 않는다
+		 * 
+		 * 하지만 target 파일을 datedFilename 파일로 하면 파일생성
+		 * 
 		 */
-		LogLog.debug("scheduledFilename "+scheduledFilename);
-		LogLog.debug("datedFilename "+datedFilename);
-		
-		LogLog.debug("scheduledFoldername "+scheduledFoldername);
-		LogLog.debug("dateScheduledFoldername "+dateScheduledFoldername);
-		
-		if (scheduledFilename.equals(datedFilename) && scheduledFoldername.equals(dateScheduledFoldername)) {
+		LogLog.debug("scheduledFilename " + scheduledFilename+" scheduledFoldername " + scheduledFoldername+" datedFilename " + datedFilename+" dateScheduledFoldername " + dateScheduledFoldername);
+
+		if (scheduledFileNamePath.equals(datedFileNamePath) && scheduledFoldername.equals(dateScheduledFoldername)) {
+			LogLog.debug("no file return ");
 			return;
 		}
 
 		File folder = new File(filePath + File.separatorChar + scheduledFoldername);
 
 		if (!folder.exists()) {
+			LogLog.debug("scheduledFoldername "+filePath + File.separatorChar +scheduledFoldername);
 			folder.mkdir();
 		}
 
 		// close current file, and rename it to datedFilename
 		this.closeFile();
-		
-		File target = new File(scheduledFilename);
-		
+
+		File target = new File(scheduledFileNamePath);
+
 		if (target.exists()) {
 			target.delete();
 		}
@@ -295,7 +302,7 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 		File file = new File(filePath + File.separatorChar + fileName);
 		boolean result = file.renameTo(target);
 		if (result) {
-			LogLog.debug(fileName + " -> " + scheduledFilename);
+			LogLog.debug(fileName + " -> " + scheduledFilename+ " scheduledFileNamePath "+scheduledFileNamePath);
 		} else {
 			LogLog.error("Failed to rename [" + fileName + "] to [" + scheduledFilename + "].");
 		}
@@ -308,6 +315,8 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 			errorHandler.error("setFile(" + fileName + ", true) call failed.");
 		}
 		scheduledFilename = datedFilename;
+		scheduledFoldername = dateScheduledFoldername;
+		
 	}
 
 	/**
@@ -323,7 +332,7 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 		if ((n >= nextCheck) || (n >= nextFCheck)) {
 			now.setTime(n);
 			nextCheck = rc.getNextCheckMillis(now);
-			nextFCheck = frc.getFNextCheckMillis(now);
+			nextFCheck = frc.getNextCheckMillis(now);
 			try {
 				rollOver();
 			} catch (IOException ioe) {
@@ -346,7 +355,6 @@ class FolderRollingCalendar extends GregorianCalendar {
 	private static final long serialVersionUID = -3560331770601814177L;
 
 	int type = DailyRollingFolderAndFileAppender.TOP_OF_TROUBLE;
-	int ftype = DailyRollingFolderAndFileAppender.TOP_OF_TROUBLE;
 
 	FolderRollingCalendar() {
 		super();
@@ -358,10 +366,6 @@ class FolderRollingCalendar extends GregorianCalendar {
 
 	void setType(int type) {
 		this.type = type;
-	}
-
-	void setFtype(int ftype) {
-		this.ftype = ftype;
 	}
 
 	public long getNextCheckMillis(Date now) {
@@ -423,15 +427,33 @@ class FolderRollingCalendar extends GregorianCalendar {
 		}
 		return getTime();
 	}
+}
 
-	public long getFNextCheckMillis(Date now) {
-		return getFNextCheckDate(now).getTime();
+class RollingCalendar extends GregorianCalendar {
+	private static final long serialVersionUID = -3560331770601814177L;
+
+	int type = DailyRollingFolderAndFileAppender.TOP_OF_TROUBLE;
+
+	RollingCalendar() {
+		super();
 	}
 
-	public Date getFNextCheckDate(Date now) {
+	RollingCalendar(TimeZone tz, Locale locale) {
+		super(tz, locale);
+	}
+
+	void setType(int type) {
+		this.type = type;
+	}
+
+	public long getNextCheckMillis(Date now) {
+		return getNextCheckDate(now).getTime();
+	}
+
+	public Date getNextCheckDate(Date now) {
 		this.setTime(now);
 
-		switch (ftype) {
+		switch (type) {
 		case DailyRollingFolderAndFileAppender.TOP_OF_MINUTE:
 			this.set(Calendar.SECOND, 0);
 			this.set(Calendar.MILLISECOND, 0);
