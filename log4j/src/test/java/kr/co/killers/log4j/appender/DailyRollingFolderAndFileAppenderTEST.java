@@ -11,8 +11,8 @@ public class DailyRollingFolderAndFileAppenderTEST extends TestCase {
 	
 	String filePath = "logs";
 	String file = "temp.log";
-	String datePattern = "'.'yyyy-MM-dd-HH-mm-ss";
-	String folderDatePattern = "yyyyMMddHHmm";
+	String datePattern = "'.'yyyy-MM-dd-HH-mm";
+	String folderDatePattern = "yyyyMMddHH";
 
 	Logger logger = Logger.getLogger(Test.class);
 	
@@ -41,7 +41,7 @@ public class DailyRollingFolderAndFileAppenderTEST extends TestCase {
 
 		try {
 			//폴더 롤링을 확인하기 위해서 60초 동안 대기
-			Thread.sleep(60000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
