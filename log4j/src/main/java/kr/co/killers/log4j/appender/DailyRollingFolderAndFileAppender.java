@@ -146,22 +146,22 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 	void printPeriodicity(int type) {
 		switch (type) {
 		case TOP_OF_MINUTE:
-			LogLog.debug("Appender [" + name + "] to be rolled every minute.");
+			LogLog.debug("Appender [" + name + "] file to be rolled every minute.");
 			break;
 		case TOP_OF_HOUR:
-			LogLog.debug("Appender [" + name + "] to be rolled on top of every hour.");
+			LogLog.debug("Appender [" + name + "] file to be rolled on top of every hour.");
 			break;
 		case HALF_DAY:
-			LogLog.debug("Appender [" + name + "] to be rolled at midday and midnight.");
+			LogLog.debug("Appender [" + name + "] file to be rolled at midday and midnight.");
 			break;
 		case TOP_OF_DAY:
-			LogLog.debug("Appender [" + name + "] to be rolled at midnight.");
+			LogLog.debug("Appender [" + name + "] file to be rolled at midnight.");
 			break;
 		case TOP_OF_WEEK:
-			LogLog.debug("Appender [" + name + "] to be rolled at start of week.");
+			LogLog.debug("Appender [" + name + "] file to be rolled at start of week.");
 			break;
 		case TOP_OF_MONTH:
-			LogLog.debug("Appender [" + name + "] to be rolled at start of every month.");
+			LogLog.debug("Appender [" + name + "] file to be rolled at start of every month.");
 			break;
 		default:
 			LogLog.warn("Unknown periodicity for appender [" + name + "].");
@@ -171,22 +171,22 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 	void fPrintPeriodicity(int type) {
 		switch (type) {
 		case TOP_OF_MINUTE:
-			LogLog.debug("Appender [" + name + "] to be rolled every minute.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled every minute.");
 			break;
 		case TOP_OF_HOUR:
-			LogLog.debug("Appender [" + name + "] to be rolled on top of every hour.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled on top of every hour.");
 			break;
 		case HALF_DAY:
-			LogLog.debug("Appender [" + name + "] to be rolled at midday and midnight.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled at midday and midnight.");
 			break;
 		case TOP_OF_DAY:
-			LogLog.debug("Appender [" + name + "] to be rolled at midnight.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled at midnight.");
 			break;
 		case TOP_OF_WEEK:
-			LogLog.debug("Appender [" + name + "] to be rolled at start of week.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled at start of week.");
 			break;
 		case TOP_OF_MONTH:
-			LogLog.debug("Appender [" + name + "] to be rolled at start of every month.");
+			LogLog.debug("Appender [" + name + "] folder to be rolled at start of every month.");
 			break;
 		default:
 			LogLog.warn("Unknown periodicity for appender [" + name + "].");
@@ -203,7 +203,7 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 	// GMT (the epoch).
 
 	int computeCheckPeriod() {
-		FolderRollingCalendar rollingCalendar = new FolderRollingCalendar(gmtTimeZone, Locale.getDefault());
+		RollingCalendar rollingCalendar = new RollingCalendar(gmtTimeZone, Locale.getDefault());
 		// set sate to 1970-01-01 00:00:00 GMT
 		Date epoch = new Date(0);
 		if (datePattern != null) {
@@ -228,7 +228,7 @@ public class DailyRollingFolderAndFileAppender extends FileAppender {
 		FolderRollingCalendar rollingCalendar = new FolderRollingCalendar(gmtTimeZone, Locale.getDefault());
 		// set sate to 1970-01-01 00:00:00 GMT
 		Date epoch = new Date(0);
-		if (datePattern != null) {
+		if (folderDatePattern != null) {
 			for (int i = TOP_OF_MINUTE; i <= TOP_OF_MONTH; i++) {
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(folderDatePattern);
 				simpleDateFormat.setTimeZone(gmtTimeZone); // do all date
